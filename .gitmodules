@@ -1,0 +1,3 @@
+[submodule "wearegen"]
+	path = wearegen
+	url = git@github.com:emdeevy/wearegen.git
