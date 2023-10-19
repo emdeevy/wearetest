@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 class ItemsHandler
 {
     private array $itemCriteria = [
@@ -24,7 +26,7 @@ class ItemsHandler
         return $this->itemCriteria;
     }
 
-    public function itemExists($item): bool
+    public function itemExists(array $item): bool
     {
         foreach ($item as $key => $value) {
             if ($this->existingItem[$key] != $value) {
@@ -36,9 +38,11 @@ class ItemsHandler
     }
 }
 
-function saveItems($items): void
+function saveItems(string $items): void
 {
     global $savedItemCount, $savedNames;
+
+    $items = json_decode($items, true);
 
     $handler = new ItemsHandler();
 
@@ -68,7 +72,7 @@ function saveItems($items): void
         $mobileItem = array_merge($desktopItem, ["is_mobile" => 1]);
 
         foreach([$desktopItem, $mobileItem] as $item) {
-            !$handler->itemExists($item) && $savedItemCount++ && $savedNames[] = $item['game_name'];
+            !$handler->itemExists($item) && ++$savedItemCount && $savedNames[] = ($item['is_mobile'] ? 'mobile:' : 'desktop:') . $item['id'];
         }
     }
 }
@@ -76,9 +80,8 @@ function saveItems($items): void
 $savedItemCount = 0;
 $savedNames = [];
 
-$itemsString = file_get_contents('./wearegen/priv/items.json');
-$items = json_decode($itemsString, true);
+$items = file_get_contents('./wearegen/priv/items.json');
 
 saveItems($items);
 
-printf("Saved %d items%s.\n", $savedItemCount, (empty($savedNames) ?: " (" . implode(", ", $savedNames) . ")"));
+printf("Saved %d items\n%s.\n", $savedItemCount, (empty($savedNames) ?: "[" . implode(", ", $savedNames) . "]"));
