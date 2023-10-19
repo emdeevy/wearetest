@@ -1,7 +1,6 @@
 <?php
 class ItemsHandler
 {
-
     private array $itemCriteria = [
         "game_name" => "",
         "id" => "",
@@ -53,10 +52,8 @@ function saveItems($items): void
             continue;
         }
 
-        $isActive = $_item['active'] && ($releaseDate <= $currentDate);
-
         if(!$_item['active'] || $releaseDate > $currentDate) {
-            continue; // no need to continue, efficiency
+            continue; // avoid unnecessary computation
         }
 
         // desktop item
@@ -71,7 +68,7 @@ function saveItems($items): void
         $mobileItem = array_merge($desktopItem, ["is_mobile" => 1]);
 
         foreach([$desktopItem, $mobileItem] as $item) {
-                !$handler->itemExists($item) && $savedItemCount++ && $savedNames[] = $item['game_name'];
+            !$handler->itemExists($item) && $savedItemCount++ && $savedNames[] = $item['game_name'];
         }
     }
 }
